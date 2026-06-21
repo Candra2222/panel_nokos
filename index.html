@@ -5,77 +5,70 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DGD OTP Dashboard</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0e1a; color: #e2e8f0; min-height: 100vh; }
-  .container { max-width: 900px; margin: 0 auto; padding: 20px; }
-  .header { text-align: center; padding: 30px 0; border-bottom: 1px solid #1e293b; margin-bottom: 25px; }
-  .header h1 { font-size: 2rem; color: #38bdf8; letter-spacing: -1px; }
-  .header p { color: #94a3b8; margin-top: 6px; font-size: 0.95rem; }
-  .card { background: #111827; border: 1px solid #1e293b; border-radius: 14px; padding: 22px; margin-bottom: 20px; }
-  .card h2 { font-size: 1.1rem; color: #7dd3fc; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-  .form-group { margin-bottom: 16px; }
-  .form-group label { display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px; font-weight: 500; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border: 1px solid #334155; border-radius: 8px; background: #0f172a; color: #e2e8f0; font-size: 0.95rem; outline: none; transition: border 0.2s; }
-  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #38bdf8; }
-  .form-group input::placeholder { color: #475569; }
-  .form-group textarea { min-height: 80px; font-family: monospace; font-size: 0.85rem; resize: vertical; }
-  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-  .btn-primary { background: #0ea5e9; color: #fff; }
-  .btn-primary:hover { background: #0284c7; }
-  .btn-danger { background: #ef4444; color: #fff; }
-  .btn-danger:hover { background: #dc2626; }
-  .btn-success { background: #10b981; color: #fff; }
-  .btn-success:hover { background: #059669; }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-  .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
-  .status-wait { background: #451a03; color: #fbbf24; border: 1px solid #92400e; }
-  .status-success { background: #064e3b; color: #34d399; border: 1px solid #059669; }
-  .status-expired { background: #450a0a; color: #f87171; border: 1px solid #991b1b; }
-  .status-polling { background: #1e3a5f; color: #7dd3fc; border: 1px solid #0ea5e9; }
-  .otp-display { font-size: 2.5rem; font-weight: 700; letter-spacing: 8px; color: #34d399; text-align: center; padding: 20px; background: #064e3b; border-radius: 12px; border: 2px solid #059669; margin: 15px 0; font-family: 'Courier New', monospace; }
-  .otp-display.empty { color: #475569; background: #1e293b; border-color: #334155; font-size: 1.2rem; letter-spacing: 2px; }
-  .number-display { font-size: 1.5rem; font-weight: 600; color: #38bdf8; text-align: center; padding: 14px; background: #1e3a5f; border-radius: 10px; border: 1px solid #0ea5e9; margin: 10px 0; font-family: 'Courier New', monospace; }
-  .number-display.empty { color: #475569; background: #1e293b; border-color: #334155; font-size: 1rem; }
-  .log { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto; font-family: 'Courier New', monospace; font-size: 0.8rem; color: #94a3b8; }
-  .log .log-time { color: #64748b; }
-  .log .log-info { color: #38bdf8; }
-  .log .log-success { color: #34d399; }
-  .log .log-error { color: #f87171; }
-  .log .log-warn { color: #fbbf24; }
-  .timer { text-align: center; font-size: 1rem; color: #94a3b8; margin: 10px 0; }
-  .timer span { color: #fbbf24; font-weight: 600; }
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
-  .stat-box { background: #111827; border: 1px solid #1e293b; border-radius: 10px; padding: 16px; text-align: center; }
-  .stat-box .stat-value { font-size: 1.5rem; font-weight: 700; color: #38bdf8; }
-  .stat-box .stat-label { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
-  .toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 10px; font-weight: 500; font-size: 0.9rem; z-index: 1000; animation: slideIn 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-  .toast-success { background: #064e3b; color: #34d399; border: 1px solid #059669; }
-  .toast-error { background: #450a0a; color: #f87171; border: 1px solid #991b1b; }
-  .toast-info { background: #1e3a5f; color: #7dd3fc; border: 1px solid #0ea5e9; }
-  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-  .history-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  .history-table th, .history-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #1e293b; font-size: 0.85rem; }
-  .history-table th { color: #94a3b8; font-weight: 500; }
-  .history-table td { color: #e2e8f0; }
-  .history-table tr:hover td { background: #1e293b; }
-  .section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; margin-bottom: 12px; }
-  .range-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-  .range-tab { padding: 8px 14px; border: 1px solid #334155; border-radius: 6px; background: #0f172a; cursor: pointer; font-size: 0.8rem; color: #94a3b8; transition: all 0.2s; }
-  .range-tab:hover { border-color: #38bdf8; color: #38bdf8; }
-  .range-tab.active { background: #0ea5e9; color: #fff; border-color: #0ea5e9; font-weight: 600; }
-  .range-custom { margin-top: 10px; }
-  .tab-group { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid #1e293b; padding-bottom: 8px; }
-  .tab-btn { padding: 6px 14px; border: none; background: none; color: #94a3b8; font-size: 0.85rem; cursor: pointer; border-radius: 6px; }
-  .tab-btn:hover { color: #e2e8f0; }
-  .tab-btn.active { background: #1e3a5f; color: #7dd3fc; }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-  .copy-btn { background: #334155; color: #e2e8f0; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
-  .copy-btn:hover { background: #475569; }
-  .api-status { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; margin-left: 8px; }
-  .api-status.ok { background: #064e3b; color: #34d399; }
-  .api-status.err { background: #450a0a; color: #f87171; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0;min-height:100vh}
+  .container{max-width:900px;margin:0 auto;padding:20px}
+  .header{text-align:center;padding:30px 0;border-bottom:1px solid #1e293b;margin-bottom:25px}
+  .header h1{font-size:2rem;color:#38bdf8;letter-spacing:-1px}
+  .header p{color:#94a3b8;margin-top:6px;font-size:.95rem}
+  .card{background:#111827;border:1px solid #1e293b;border-radius:14px;padding:22px;margin-bottom:20px}
+  .card h2{font-size:1.1rem;color:#7dd3fc;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .form-group{margin-bottom:16px}
+  .form-group label{display:block;font-size:.85rem;color:#94a3b8;margin-bottom:6px;font-weight:500}
+  .form-group input,.form-group select,.form-group textarea{width:100%;padding:12px 14px;border:1px solid #334155;border-radius:8px;background:#0f172a;color:#e2e8f0;font-size:.95rem;outline:none;transition:border .2s}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#38bdf8}
+  .form-group input::placeholder{color:#475569}
+  .form-group textarea{min-height:120px;font-family:monospace;font-size:.85rem;resize:vertical}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s}
+  .btn-primary{background:#0ea5e9;color:#fff}
+  .btn-primary:hover{background:#0284c7}
+  .btn-danger{background:#ef4444;color:#fff}
+  .btn-danger:hover{background:#dc2626}
+  .btn-success{background:#10b981;color:#fff}
+  .btn-success:hover{background:#059669}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-group{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .status-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600}
+  .status-wait{background:#451a03;color:#fbbf24;border:1px solid #92400e}
+  .status-success{background:#064e3b;color:#34d399;border:1px solid #059669}
+  .status-expired{background:#450a0a;color:#f87171;border:1px solid #991b1b}
+  .status-polling{background:#1e3a5f;color:#7dd3fc;border:1px solid #0ea5e9}
+  .otp-display{font-size:2.5rem;font-weight:700;letter-spacing:8px;color:#34d399;text-align:center;padding:20px;background:#064e3b;border-radius:12px;border:2px solid #059669;margin:15px 0;font-family:'Courier New',monospace}
+  .otp-display.empty{color:#475569;background:#1e293b;border-color:#334155;font-size:1.2rem;letter-spacing:2px}
+  .number-display{font-size:1.5rem;font-weight:600;color:#38bdf8;text-align:center;padding:14px;background:#1e3a5f;border-radius:10px;border:1px solid #0ea5e9;margin:10px 0;font-family:'Courier New',monospace}
+  .number-display.empty{color:#475569;background:#1e293b;border-color:#334155;font-size:1rem}
+  .log{background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:12px;max-height:200px;overflow-y:auto;font-family:'Courier New',monospace;font-size:.8rem;color:#94a3b8}
+  .log .log-time{color:#64748b}
+  .log .log-info{color:#38bdf8}
+  .log .log-success{color:#34d399}
+  .log .log-error{color:#f87171}
+  .log .log-warn{color:#fbbf24}
+  .timer{text-align:center;font-size:1rem;color:#94a3b8;margin:10px 0}
+  .timer span{color:#fbbf24;font-weight:600}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+  .stat-box{background:#111827;border:1px solid #1e293b;border-radius:10px;padding:16px;text-align:center}
+  .stat-box .stat-value{font-size:1.5rem;font-weight:700;color:#38bdf8}
+  .stat-box .stat-label{font-size:.8rem;color:#94a3b8;margin-top:4px}
+  .toast{position:fixed;bottom:20px;right:20px;padding:14px 22px;border-radius:10px;font-weight:500;font-size:.9rem;z-index:1000;animation:slideIn .3s ease;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+  .toast-success{background:#064e3b;color:#34d399;border:1px solid #059669}
+  .toast-error{background:#450a0a;color:#f87171;border:1px solid #991b1b}
+  .toast-info{background:#1e3a5f;color:#7dd3fc;border:1px solid #0ea5e9}
+  @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+  .history-table{width:100%;border-collapse:collapse;margin-top:10px}
+  .history-table th,.history-table td{padding:10px 12px;text-align:left;border-bottom:1px solid #1e293b;font-size:.85rem}
+  .history-table th{color:#94a3b8;font-weight:500}
+  .history-table td{color:#e2e8f0}
+  .history-table tr:hover td{background:#1e293b}
+  .section-title{font-size:.75rem;text-transform:uppercase;letter-spacing:1px;color:#64748b;margin-bottom:12px}
+  .copy-btn{background:#334155;color:#e2e8f0;border:none;padding:6px 12px;border-radius:6px;font-size:.8rem;cursor:pointer}
+  .copy-btn:hover{background:#475569}
+  .api-status{display:inline-block;padding:4px 10px;border-radius:12px;font-size:.75rem;font-weight:600;margin-left:8px}
+  .api-status.ok{background:#064e3b;color:#34d399}
+  .api-status.err{background:#450a0a;color:#f87171}
+  .range-chip{display:inline-block;padding:6px 12px;border:1px solid #334155;border-radius:6px;background:#0f172a;margin:3px;font-size:.8rem;color:#94a3b8;cursor:pointer}
+  .range-chip:hover{border-color:#38bdf8;color:#38bdf8}
+  .range-chip.active{background:#0ea5e9;color:#fff;border-color:#0ea5e9;font-weight:600}
+  .range-list{display:flex;flex-wrap:wrap;margin-top:8px}
 </style>
 <base target="_blank">
 </head>
@@ -112,66 +105,29 @@
     <h2>🔑 Konfigurasi API</h2>
     <div class="form-group">
       <label>API Key <span class="api-status err" id="apiStatus">Belum tes</span></label>
-      <input type="text" id="apiKey" placeholder="Masukkan API Key DGD Anda..." value="dgd_ba6c65f67d20340788c8370da10f52b290521522b49ec518">
+      <input type="text" id="apiKey" placeholder="Masukkan API Key DGD Anda..." value="">
     </div>
     <div class="btn-group">
-      <button class="btn btn-primary" onclick="testApi()">🧪 Tes Koneksi</button>
-      <button class="btn btn-success" onclick="fetchRanges()">📥 Ambil Range dari DGD</button>
+      <button class="btn btn-primary" id="btnTestApi">🧪 Tes Koneksi</button>
     </div>
   </div>
 
   <!-- Pilih Range -->
   <div class="card">
-    <h2>📱 Pilih Range Nomor</h2>
-
-    <div class="tab-group">
-      <button class="tab-btn active" onclick="switchTab('preset')">📋 Preset</button>
-      <button class="tab-btn" onclick="switchTab('custom')">✏️ Custom</button>
-      <button class="tab-btn" onclick="switchTab('dgd')">🌐 DGD Dashboard</button>
-    </div>
-
-    <div class="tab-content active" id="tab-preset">
-      <div class="section-title">Klik range di bawah:</div>
-      <div class="range-tabs" id="rangePreset">
-        <div class="range-tab" data-range="4473845XXX">🇬🇧 4473845XXX</div>
-        <div class="range-tab" data-range="4473846XXX">🇬🇧 4473846XXX</div>
-        <div class="range-tab" data-range="4473847XXX">🇬🇧 4473847XXX</div>
-        <div class="range-tab" data-range="4473848XXX">🇬🇧 4473848XXX</div>
-        <div class="range-tab" data-range="4473849XXX">🇬🇧 4473849XXX</div>
-        <div class="range-tab" data-range="4473850XXX">🇬🇧 4473850XXX</div>
-        <div class="range-tab" data-range="4473851XXX">🇬🇧 4473851XXX</div>
-        <div class="range-tab" data-range="4473852XXX">🇬🇧 4473852XXX</div>
-        <div class="range-tab" data-range="4473853XXX">🇬🇧 4473853XXX</div>
-        <div class="range-tab" data-range="4473854XXX">🇬🇧 4473854XXX</div>
-        <div class="range-tab" data-range="4473855XXX">🇬🇧 4473855XXX</div>
-        <div class="range-tab" data-range="4473856XXX">🇬🇧 4473856XXX</div>
-      </div>
-    </div>
-
-    <div class="tab-content" id="tab-custom">
-      <div class="form-group">
-        <label>Masukkan Range Manual</label>
-        <input type="text" id="rangeCustom" placeholder="Contoh: 4473845XXX">
-      </div>
-    </div>
-
-    <div class="tab-content" id="tab-dgd">
-      <div class="form-group">
-        <label>Range dari DGD Dashboard (paste dari dashboard)</label>
-        <textarea id="rangeDGD" placeholder="Paste range dari dashboard DGD Anda, satu per baris...
+    <h2>📱 Range Nomor (Edit di bawah)</h2>
+    <div class="section-title">Tambah/hapus range sesuai kebutuhan. Satu range per baris:</div>
+    <div class="form-group">
+      <textarea id="rangeList" placeholder="Masukkan range nomor, satu per baris...
 Contoh:
 4473845XXX
 4473846XXX
 4473850XXX"></textarea>
-      </div>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="parseDGDRange()">✅ Gunakan Range Ini</button>
-      </div>
     </div>
-
-    <div class="form-group" style="margin-top: 16px;">
+    <div class="section-title">Klik range untuk pilih:</div>
+    <div class="range-list" id="rangeChips"></div>
+    <div class="form-group" style="margin-top:16px">
       <label>Range Terpilih</label>
-      <input type="text" id="rangeInput" placeholder="Pilih range di atas..." readonly style="font-weight: 600; color: #38bdf8;">
+      <input type="text" id="rangeInput" placeholder="Klik range di atas..." readonly style="font-weight:600;color:#38bdf8">
     </div>
   </div>
 
@@ -179,23 +135,23 @@ Contoh:
   <div class="card">
     <h2>⚡ Kontrol</h2>
     <div class="btn-group">
-      <button class="btn btn-primary" id="btnGetNumber" onclick="getNumber()">📱 Ambil Nomor</button>
-      <button class="btn btn-success" id="btnStartOTP" onclick="startOTP()" disabled>🔐 Mulai OTP</button>
-      <button class="btn btn-danger" id="btnStop" onclick="stopAll()" disabled>⏹ Stop</button>
+      <button class="btn btn-primary" id="btnGetNumber">📱 Ambil Nomor</button>
+      <button class="btn btn-success" id="btnStartOTP" disabled>🔐 Mulai OTP</button>
+      <button class="btn btn-danger" id="btnStop" disabled>⏹ Stop</button>
     </div>
   </div>
 
   <!-- Status -->
   <div class="card">
     <h2>📊 Status</h2>
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
       <div>Status: <span class="status-badge status-wait" id="statusBadge">IDLE</span></div>
       <div class="timer">⏱ Polling: <span id="timerCount">0</span>/60</div>
     </div>
     <div class="number-display empty" id="numberDisplay">Belum ada nomor</div>
     <div class="otp-display empty" id="otpDisplay">Menunggu OTP...</div>
-    <div style="text-align: center; margin-top: 10px;">
-      <button class="copy-btn" onclick="copyOTP()" id="copyBtn" style="display: none;">📋 Copy OTP</button>
+    <div style="text-align:center;margin-top:10px">
+      <button class="copy-btn" id="copyBtn" style="display:none">📋 Copy OTP</button>
     </div>
   </div>
 
@@ -203,8 +159,8 @@ Contoh:
   <div class="card">
     <h2>📝 Log Aktivitas</h2>
     <div class="log" id="logBox"></div>
-    <div class="btn-group" style="margin-top: 10px;">
-      <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.85rem;" onclick="clearLog()">🗑 Clear Log</button>
+    <div class="btn-group" style="margin-top:10px">
+      <button class="btn btn-primary" id="btnClearLog" style="padding:8px 16px;font-size:.85rem">🗑 Clear Log</button>
     </div>
   </div>
 
@@ -222,407 +178,356 @@ Contoh:
 </div>
 
 <script>
-const BASE_URL = 'https://dgddigital.com';
-let currentNumber = null;
-let currentRange = null;
-let pollingInterval = null;
-let pollCount = 0;
-let maxPoll = 60;
-let history = JSON.parse(localStorage.getItem('dgd_history') || '[]');
-let stats = JSON.parse(localStorage.getItem('dgd_stats') || '{"total":0,"success":0,"pending":0,"expired":0}');
+(function(){
+  var BASE_URL = 'https://dgddigital.com';
+  var API_KEY = '';
+  var MAX_POLL = 60;
+  var currentNumber = null;
+  var currentRange = null;
+  var pollingInterval = null;
+  var pollCount = 0;
+  var history = JSON.parse(localStorage.getItem('dgd_history') || '[]');
+  var stats = JSON.parse(localStorage.getItem('dgd_stats') || '{"total":0,"success":0,"pending":0,"expired":0}');
 
-// Load saved API key
-const savedKey = localStorage.getItem('dgd_apikey');
-if (savedKey) {
-  document.getElementById('apiKey').value = savedKey;
-}
+  // DOM refs
+  var elApiKey = document.getElementById('apiKey');
+  var elApiStatus = document.getElementById('apiStatus');
+  var elRangeList = document.getElementById('rangeList');
+  var elRangeChips = document.getElementById('rangeChips');
+  var elRangeInput = document.getElementById('rangeInput');
+  var elNumberDisplay = document.getElementById('numberDisplay');
+  var elOtpDisplay = document.getElementById('otpDisplay');
+  var elStatusBadge = document.getElementById('statusBadge');
+  var elTimerCount = document.getElementById('timerCount');
+  var elLogBox = document.getElementById('logBox');
+  var elHistoryBody = document.getElementById('historyBody');
+  var elBtnGet = document.getElementById('btnGetNumber');
+  var elBtnOtp = document.getElementById('btnStartOTP');
+  var elBtnStop = document.getElementById('btnStop');
+  var elCopyBtn = document.getElementById('copyBtn');
 
-// Range preset selection
-const rangeTabs = document.querySelectorAll('.range-tab');
-rangeTabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    rangeTabs.forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('rangeInput').value = tab.dataset.range;
-    currentRange = tab.dataset.range;
+  // Load saved data
+  var savedKey = localStorage.getItem('dgd_apikey');
+  if (savedKey) elApiKey.value = savedKey;
+
+  var savedRanges = localStorage.getItem('dgd_ranges');
+  if (savedRanges) {
+    elRangeList.value = savedRanges;
+  } else {
+    // Default ranges
+    elRangeList.value = '4473845XXX
+4473846XXX
+4473847XXX
+4473848XXX
+4473849XXX
+4473850XXX
+4473851XXX
+4473852XXX
+4473853XXX
+4473854XXX
+4473855XXX
+4473856XXX';
+  }
+  renderRangeChips();
+
+  // Event listeners
+  elRangeList.addEventListener('input', function() {
+    localStorage.setItem('dgd_ranges', elRangeList.value);
+    renderRangeChips();
   });
-});
 
-// Tab switching
-function switchTab(tabName) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('tab-' + tabName).classList.add('active');
-}
+  document.getElementById('btnTestApi').addEventListener('click', testApi);
+  elBtnGet.addEventListener('click', getNumber);
+  elBtnOtp.addEventListener('click', startOTP);
+  elBtnStop.addEventListener('click', stopAll);
+  document.getElementById('btnClearLog').addEventListener('click', clearLog);
+  elCopyBtn.addEventListener('click', copyOTP);
 
-function log(msg, type = 'info') {
-  const box = document.getElementById('logBox');
-  const time = new Date().toLocaleTimeString('id-ID');
-  const cls = type === 'success' ? 'log-success' : type === 'error' ? 'log-error' : type === 'warn' ? 'log-warn' : 'log-info';
-  box.innerHTML += `<div><span class="log-time">[${time}]</span> <span class="${cls}">${msg}</span></div>`;
-  box.scrollTop = box.scrollHeight;
-}
+  function renderRangeChips() {
+    var lines = elRangeList.value.split(/\n/).map(function(l){return l.trim()}).filter(function(l){return l});
+    elRangeChips.innerHTML = '';
+    for (var i = 0; i < lines.length; i++) {
+      var chip = document.createElement('div');
+      chip.className = 'range-chip';
+      chip.textContent = lines[i];
+      chip.dataset.range = lines[i];
+      chip.addEventListener('click', function() {
+        var chips = elRangeChips.querySelectorAll('.range-chip');
+        for (var j = 0; j < chips.length; j++) chips[j].classList.remove('active');
+        this.classList.add('active');
+        elRangeInput.value = this.dataset.range;
+        currentRange = this.dataset.range;
+      });
+      elRangeChips.appendChild(chip);
+    }
+  }
 
-function toast(msg, type = 'info') {
-  const t = document.createElement('div');
-  t.className = `toast toast-${type === 'success' ? 'success' : type === 'error' ? 'error' : 'info'}`;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
-}
+  function log(msg, type) {
+    var time = new Date().toLocaleTimeString('id-ID');
+    var color = type === 'success' ? '#34d399' : type === 'error' ? '#f87171' : type === 'warn' ? '#fbbf24' : '#38bdf8';
+    elLogBox.innerHTML += '<div><span style="color:#64748b">[' + time + ']</span> <span style="color:' + color + '">' + msg + '</span></div>';
+    elLogBox.scrollTop = elLogBox.scrollHeight;
+  }
 
-function updateStats() {
-  document.getElementById('statTotal').textContent = stats.total;
-  document.getElementById('statSuccess').textContent = stats.success;
-  document.getElementById('statPending').textContent = stats.pending;
-  document.getElementById('statExpired').textContent = stats.expired;
-  localStorage.setItem('dgd_stats', JSON.stringify(stats));
-}
-updateStats();
+  function toast(msg, type) {
+    var t = document.createElement('div');
+    var bg = type === 'success' ? '#064e3b' : type === 'error' ? '#450a0a' : '#1e3a5f';
+    var col = type === 'success' ? '#34d399' : type === 'error' ? '#f87171' : '#7dd3fc';
+    var border = type === 'success' ? '#059669' : type === 'error' ? '#991b1b' : '#0ea5e9';
+    t.style = 'position:fixed;bottom:20px;right:20px;padding:14px 22px;border-radius:10px;font-weight:500;font-size:.9rem;z-index:1000;animation:slideIn .3s ease;box-shadow:0 10px 30px rgba(0,0,0,.4);background:' + bg + ';color:' + col + ';border:1px solid ' + border;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove() }, 3000);
+  }
 
-function updateStatus(status) {
-  const badge = document.getElementById('statusBadge');
-  badge.className = 'status-badge';
-  if (status === 'IDLE') badge.classList.add('status-wait');
-  else if (status === 'POLLING') badge.classList.add('status-polling');
-  else if (status === 'SUKSES') badge.classList.add('status-success');
-  else if (status === 'EXPIRED') badge.classList.add('status-expired');
-  else badge.classList.add('status-wait');
-  badge.textContent = status;
-}
+  function updateStats() {
+    document.getElementById('statTotal').textContent = stats.total;
+    document.getElementById('statSuccess').textContent = stats.success;
+    document.getElementById('statPending').textContent = stats.pending;
+    document.getElementById('statExpired').textContent = stats.expired;
+    localStorage.setItem('dgd_stats', JSON.stringify(stats));
+  }
+  updateStats();
 
-function addHistory(number, range, otp, status) {
-  const entry = { time: new Date().toLocaleString('id-ID'), number, range, otp, status };
-  history.unshift(entry);
-  if (history.length > 50) history.pop();
-  localStorage.setItem('dgd_history', JSON.stringify(history));
+  function updateStatus(status) {
+    elStatusBadge.className = 'status-badge';
+    if (status === 'IDLE') elStatusBadge.classList.add('status-wait');
+    else if (status === 'POLLING') elStatusBadge.classList.add('status-polling');
+    else if (status === 'SUKSES') elStatusBadge.classList.add('status-success');
+    else if (status === 'EXPIRED') elStatusBadge.classList.add('status-expired');
+    else elStatusBadge.classList.add('status-wait');
+    elStatusBadge.textContent = status;
+  }
+
+  function addHistory(number, range, otp, status) {
+    var entry = { time: new Date().toLocaleString('id-ID'), number: number, range: range, otp: otp, status: status };
+    history.unshift(entry);
+    if (history.length > 50) history.pop();
+    localStorage.setItem('dgd_history', JSON.stringify(history));
+    renderHistory();
+  }
+
+  function renderHistory() {
+    elHistoryBody.innerHTML = history.map(function(h) {
+      var statusClass = h.status === 'SUKSES' ? 'status-success' : h.status === 'EXPIRED' ? 'status-expired' : 'status-wait';
+      return '<tr><td>' + h.time + '</td><td>' + h.number + '</td><td>' + h.range + '</td><td><strong>' + (h.otp || '-') + '</strong></td><td><span class="status-badge ' + statusClass + '">' + h.status + '</span></td></tr>';
+    }).join('');
+  }
   renderHistory();
-}
 
-function renderHistory() {
-  const tbody = document.getElementById('historyBody');
-  tbody.innerHTML = history.map(h => `
-    <tr>
-      <td>${h.time}</td>
-      <td>${h.number}</td>
-      <td>${h.range}</td>
-      <td><strong>${h.otp || '-'}</strong></td>
-      <td><span class="status-badge status-${h.status === 'SUKSES' ? 'success' : h.status === 'EXPIRED' ? 'expired' : 'wait'}">${h.status}</span></td>
-    </tr>
-  `).join('');
-}
-renderHistory();
-
-function clearLog() {
-  document.getElementById('logBox').innerHTML = '';
-}
-
-function getApiKey() {
-  const key = document.getElementById('apiKey').value.trim();
-  if (!key) {
-    toast('API Key wajib diisi!', 'error');
-    return null;
-  }
-  localStorage.setItem('dgd_apikey', key);
-  return key;
-}
-
-function getSelectedRange() {
-  // Cek tab aktif
-  const activeTab = document.querySelector('.tab-btn.active').textContent;
-  let range = '';
-
-  if (activeTab.includes('Preset')) {
-    range = document.getElementById('rangeInput').value.trim();
-  } else if (activeTab.includes('Custom')) {
-    range = document.getElementById('rangeCustom').value.trim();
-  } else if (activeTab.includes('DGD')) {
-    range = document.getElementById('rangeInput').value.trim();
+  function clearLog() {
+    elLogBox.innerHTML = '';
   }
 
-  return range;
-}
-
-function parseDGDRange() {
-  const text = document.getElementById('rangeDGD').value.trim();
-  if (!text) {
-    toast('Masukkan range dari DGD!', 'error');
-    return;
+  function getApiKey() {
+    var key = elApiKey.value.trim();
+    if (!key) { toast('API Key wajib diisi!', 'error'); return null; }
+    localStorage.setItem('dgd_apikey', key);
+    API_KEY = key;
+    return key;
   }
-  const lines = text.split(/
-/).map(l => l.trim()).filter(l => l);
-  if (lines.length === 0) {
-    toast('Tidak ada range yang valid!', 'error');
-    return;
-  }
-  // Ambil yang pertama sebagai default, atau bisa pilih semua
-  document.getElementById('rangeInput').value = lines[0];
-  currentRange = lines[0];
-  toast('Range dari DGD dipilih: ' + lines[0], 'success');
-  log('Range dari DGD: ' + lines.join(', '), 'success');
-}
 
-async function testApi() {
-  const apiKey = getApiKey();
-  if (!apiKey) return;
-
-  log('Mengetes koneksi API...', 'info');
-  try {
-    const res = await fetch(`${BASE_URL}/api/v1/user/getnum`, {
-      method: 'POST',
-      headers: {
-        'X-API-KEY': apiKey,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        range: '4473845XXX',
-        is_national: false,
-        remove_plus: false
-      })
-    });
-
-    const statusEl = document.getElementById('apiStatus');
-    if (res.status === 401) {
-      statusEl.textContent = 'Invalid Key';
-      statusEl.className = 'api-status err';
-      toast('API Key tidak valid!', 'error');
-      log('API Key tidak valid (401)', 'error');
-    } else if (res.ok || res.status === 400) {
-      statusEl.textContent = 'Terhubung';
-      statusEl.className = 'api-status ok';
-      toast('API terhubung!', 'success');
-      log('API terhubung (status: ' + res.status + ')', 'success');
-    } else {
-      statusEl.textContent = 'Error ' + res.status;
-      statusEl.className = 'api-status err';
-      toast('Error: ' + res.status, 'error');
-      log('Error koneksi: ' + res.status, 'error');
+  async function testApi() {
+    var key = getApiKey();
+    if (!key) return;
+    log('Mengetes koneksi API...', 'info');
+    try {
+      var res = await fetch(BASE_URL + '/api/v1/user/getnum', {
+        method: 'POST',
+        headers: { 'X-API-KEY': key, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ range: '4473845XXX', is_national: false, remove_plus: false })
+      });
+      if (res.status === 401) {
+        elApiStatus.textContent = 'Invalid Key';
+        elApiStatus.className = 'api-status err';
+        toast('API Key tidak valid!', 'error');
+        log('API Key tidak valid (401)', 'error');
+      } else if (res.ok || res.status === 400) {
+        elApiStatus.textContent = 'Terhubung';
+        elApiStatus.className = 'api-status ok';
+        toast('API terhubung!', 'success');
+        log('API terhubung (status: ' + res.status + ')', 'success');
+      } else {
+        elApiStatus.textContent = 'Error ' + res.status;
+        elApiStatus.className = 'api-status err';
+        toast('Error: ' + res.status, 'error');
+        log('Error koneksi: ' + res.status, 'error');
+      }
+    } catch (err) {
+      elApiStatus.textContent = 'Gagal';
+      elApiStatus.className = 'api-status err';
+      toast('Koneksi gagal: ' + err.message, 'error');
+      log('Koneksi gagal: ' + err.message, 'error');
     }
-  } catch (err) {
-    const statusEl = document.getElementById('apiStatus');
-    statusEl.textContent = 'Gagal';
-    statusEl.className = 'api-status err';
-    toast('Koneksi gagal: ' + err.message, 'error');
-    log('Koneksi gagal: ' + err.message, 'error');
-  }
-}
-
-async function fetchRanges() {
-  toast('DGD tidak menyediakan endpoint range publik.
-Gunakan tab "DGD Dashboard" untuk paste range.', 'warn');
-  log('Info: Range dari DGD harus di-copy manual dari dashboard', 'warn');
-  switchTab('dgd');
-}
-
-async function getNumber() {
-  const apiKey = getApiKey();
-  if (!apiKey) return;
-
-  const range = getSelectedRange();
-  if (!range) {
-    toast('Pilih range nomor terlebih dahulu!', 'error');
-    return;
   }
 
-  document.getElementById('btnGetNumber').disabled = true;
-  log('Mengambil nomor dari range: ' + range, 'info');
+  async function getNumber() {
+    var key = getApiKey();
+    if (!key) return;
+    var range = elRangeInput.value.trim();
+    if (!range) { toast('Pilih range nomor terlebih dahulu!', 'error'); return; }
 
-  try {
-    const res = await fetch(`${BASE_URL}/api/v1/user/getnum`, {
-      method: 'POST',
-      headers: {
-        'X-API-KEY': apiKey,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        range: range,
-        is_national: false,
-        remove_plus: false
-      })
-    });
-
-    const data = await res.json();
-    console.log('Get Number Response:', data);
-
-    if (!data.ok) {
-      log('Gagal: ' + (data.message || 'Unknown error'), 'error');
-      toast(data.message || 'Gagal ambil nomor', 'error');
-      document.getElementById('btnGetNumber').disabled = false;
-      return;
-    }
-
-    const number = data.number || data.phone || (data.data && data.data.number) || (data.data && data.data.copy);
-    if (!number) {
-      log('Nomor tidak ditemukan di response', 'error');
-      toast('Nomor tidak ditemukan di response', 'error');
-      document.getElementById('btnGetNumber').disabled = false;
-      return;
-    }
-
-    currentNumber = number;
-    currentRange = range;
-    stats.total++;
-    stats.pending++;
-    updateStats();
-
-    document.getElementById('numberDisplay').textContent = number;
-    document.getElementById('numberDisplay').classList.remove('empty');
-    document.getElementById('btnStartOTP').disabled = false;
-    document.getElementById('btnGetNumber').disabled = false;
-
-    log('✅ Nomor didapat: ' + number, 'success');
-    toast('Nomor berhasil didapat!', 'success');
-
-    // Auto start OTP
-    setTimeout(() => startOTP(), 500);
-
-  } catch (err) {
-    log('Error: ' + err.message, 'error');
-    toast('Error: ' + err.message, 'error');
-    document.getElementById('btnGetNumber').disabled = false;
-  }
-}
-
-async function startOTP() {
-  if (!currentNumber) {
-    toast('Ambil nomor dulu!', 'error');
-    return;
-  }
-
-  const apiKey = getApiKey();
-  if (!apiKey) return;
-
-  stopAll();
-  pollCount = 0;
-  document.getElementById('otpDisplay').textContent = 'Menunggu OTP...';
-  document.getElementById('otpDisplay').classList.add('empty');
-  document.getElementById('copyBtn').style.display = 'none';
-  document.getElementById('btnStartOTP').disabled = true;
-  document.getElementById('btnStop').disabled = false;
-  updateStatus('POLLING');
-
-  log('Memulai polling OTP untuk: ' + currentNumber, 'info');
-
-  pollingInterval = setInterval(async () => {
-    pollCount++;
-    document.getElementById('timerCount').textContent = pollCount;
+    elBtnGet.disabled = true;
+    log('Mengambil nomor dari range: ' + range, 'info');
 
     try {
-      const res = await fetch(`${BASE_URL}/api/v1/user/checknum?nomor=${encodeURIComponent(currentNumber)}`, {
-        headers: {
-          'X-API-KEY': apiKey,
-          'Accept': 'application/json'
-        }
+      var res = await fetch(BASE_URL + '/api/v1/user/getnum', {
+        method: 'POST',
+        headers: { 'X-API-KEY': key, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ range: range, is_national: false, remove_plus: false })
       });
-
-      const data = await res.json();
-      console.log('Check OTP #' + pollCount + ':', data);
+      var data = await res.json();
+      console.log('Get Number Response:', data);
 
       if (!data.ok) {
-        log('Error polling: ' + (data.message || 'Gagal'), 'error');
-        stopAll();
-        toast(data.message || 'Polling error', 'error');
+        log('Gagal: ' + (data.message || 'Unknown error'), 'error');
+        toast(data.message || 'Gagal ambil nomor', 'error');
+        elBtnGet.disabled = false;
         return;
       }
 
-      const status = data.data && data.data.status;
-      const otp = data.data && data.data.kode_otp;
+      var number = data.number || data.phone || (data.data && data.data.number) || (data.data && data.data.copy);
+      if (!number) {
+        log('Nomor tidak ditemukan di response', 'error');
+        toast('Nomor tidak ditemukan di response', 'error');
+        elBtnGet.disabled = false;
+        return;
+      }
 
-      if (status === 'SUKSES') {
+      currentNumber = number;
+      currentRange = range;
+      stats.total++;
+      stats.pending++;
+      updateStats();
+
+      elNumberDisplay.textContent = number;
+      elNumberDisplay.classList.remove('empty');
+      elBtnOtp.disabled = false;
+      elBtnGet.disabled = false;
+
+      log('✅ Nomor didapat: ' + number, 'success');
+      toast('Nomor berhasil didapat!', 'success');
+
+      setTimeout(function(){ startOTP() }, 500);
+
+    } catch (err) {
+      log('Error: ' + err.message, 'error');
+      toast('Error: ' + err.message, 'error');
+      elBtnGet.disabled = false;
+    }
+  }
+
+  async function startOTP() {
+    if (!currentNumber) { toast('Ambil nomor dulu!', 'error'); return; }
+    var key = getApiKey();
+    if (!key) return;
+
+    stopAll();
+    pollCount = 0;
+    elOtpDisplay.textContent = 'Menunggu OTP...';
+    elOtpDisplay.classList.add('empty');
+    elCopyBtn.style.display = 'none';
+    elBtnOtp.disabled = true;
+    elBtnStop.disabled = false;
+    updateStatus('POLLING');
+    log('Memulai polling OTP untuk: ' + currentNumber, 'info');
+
+    pollingInterval = setInterval(async function() {
+      pollCount++;
+      elTimerCount.textContent = pollCount;
+
+      try {
+        var res = await fetch(BASE_URL + '/api/v1/user/checknum?nomor=' + encodeURIComponent(currentNumber), {
+          headers: { 'X-API-KEY': key, 'Accept': 'application/json' }
+        });
+        var data = await res.json();
+        console.log('Check OTP #' + pollCount, data);
+
+        if (!data.ok) {
+          log('Error polling: ' + (data.message || 'Gagal'), 'error');
+          stopAll();
+          toast(data.message || 'Polling error', 'error');
+          return;
+        }
+
+        var status = data.data && data.data.status;
+        var otp = data.data && data.data.kode_otp;
+
+        if (status === 'SUKSES') {
+          stopAll();
+          stats.pending--;
+          stats.success++;
+          updateStats();
+
+          elOtpDisplay.textContent = otp;
+          elOtpDisplay.classList.remove('empty');
+          elCopyBtn.style.display = 'inline-block';
+          updateStatus('SUKSES');
+          addHistory(currentNumber, currentRange, otp, 'SUKSES');
+
+          log('🎉 OTP DITERIMA: ' + otp, 'success');
+          toast('OTP berhasil diterima: ' + otp, 'success');
+
+          navigator.clipboard.writeText(otp).then(function(){ toast('OTP sudah dicopy ke clipboard!', 'info') }).catch(function(){});
+
+        } else if (status === 'EXPIRED') {
+          stopAll();
+          stats.pending--;
+          stats.expired++;
+          updateStats();
+
+          elOtpDisplay.textContent = 'EXPIRED';
+          elOtpDisplay.classList.add('empty');
+          updateStatus('EXPIRED');
+          addHistory(currentNumber, currentRange, null, 'EXPIRED');
+
+          log('⏰ Nomor expired', 'warn');
+          toast('Nomor expired', 'warn');
+
+        } else {
+          log('Cek #' + pollCount + ': Status = ' + status, 'info');
+        }
+
+      } catch (err) {
+        log('Error polling #' + pollCount + ': ' + err.message, 'error');
+      }
+
+      if (pollCount >= MAX_POLL) {
         stopAll();
-        stats.pending--;
-        stats.success++;
-        updateStats();
-
-        document.getElementById('otpDisplay').textContent = otp;
-        document.getElementById('otpDisplay').classList.remove('empty');
-        document.getElementById('copyBtn').style.display = 'inline-block';
-        updateStatus('SUKSES');
-
-        addHistory(currentNumber, currentRange, otp, 'SUKSES');
-
-        log('🎉 OTP DITERIMA: ' + otp, 'success');
-        toast('OTP berhasil diterima: ' + otp, 'success');
-
-        // Auto copy OTP
-        navigator.clipboard.writeText(otp).then(() => {
-          toast('OTP sudah dicopy ke clipboard!', 'info');
-        }).catch(() => {});
-
-      } else if (status === 'EXPIRED') {
-        stopAll();
+        log('Polling dihentikan (max ' + MAX_POLL + 'x)', 'warn');
+        toast('Polling dihentikan (timeout)', 'warn');
         stats.pending--;
         stats.expired++;
         updateStats();
-
-        document.getElementById('otpDisplay').textContent = 'EXPIRED';
-        document.getElementById('otpDisplay').classList.add('empty');
-        updateStatus('EXPIRED');
-
-        addHistory(currentNumber, currentRange, null, 'EXPIRED');
-
-        log('⏰ Nomor expired', 'warn');
-        toast('Nomor expired', 'warn');
-
-      } else {
-        log('Cek #' + pollCount + ': Status = ' + status, 'info');
+        addHistory(currentNumber, currentRange, null, 'TIMEOUT');
       }
 
-    } catch (err) {
-      log('Error polling #' + pollCount + ': ' + err.message, 'error');
+    }, 10000);
+  }
+
+  function stopAll() {
+    if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; }
+    elBtnOtp.disabled = false;
+    elBtnStop.disabled = true;
+    if (elStatusBadge.textContent === 'POLLING') updateStatus('IDLE');
+  }
+
+  function copyOTP() {
+    var otp = elOtpDisplay.textContent;
+    if (otp && otp !== 'Menunggu OTP...' && otp !== 'EXPIRED') {
+      navigator.clipboard.writeText(otp).then(function(){ toast('OTP dicopy!', 'success') }).catch(function(){});
     }
-
-    if (pollCount >= maxPoll) {
-      stopAll();
-      log('Polling dihentikan (max ' + maxPoll + 'x)', 'warn');
-      toast('Polling dihentikan (timeout)', 'warn');
-      stats.pending--;
-      stats.expired++;
-      updateStats();
-      addHistory(currentNumber, currentRange, null, 'TIMEOUT');
-    }
-
-  }, 10000); // 10 detik
-}
-
-function stopAll() {
-  if (pollingInterval) {
-    clearInterval(pollingInterval);
-    pollingInterval = null;
   }
-  document.getElementById('btnStartOTP').disabled = false;
-  document.getElementById('btnStop').disabled = true;
-  if (document.getElementById('statusBadge').textContent === 'POLLING') {
-    updateStatus('IDLE');
-  }
-}
 
-function copyOTP() {
-  const otp = document.getElementById('otpDisplay').textContent;
-  if (otp && otp !== 'Menunggu OTP...' && otp !== 'EXPIRED') {
-    navigator.clipboard.writeText(otp).then(() => {
-      toast('OTP dicopy!', 'success');
-    }).catch(() => {});
-  }
-}
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'Enter') { getNumber(); }
+    else if (e.ctrlKey && e.key === 's') { e.preventDefault(); startOTP(); }
+    else if (e.ctrlKey && e.key === 'x') { e.preventDefault(); stopAll(); }
+  });
 
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.key === 'Enter') {
-    getNumber();
-  } else if (e.ctrlKey && e.key === 's') {
-    e.preventDefault();
-    startOTP();
-  } else if (e.ctrlKey && e.key === 'x') {
-    e.preventDefault();
-    stopAll();
-  }
-});
-
-log('Dashboard siap. Ctrl+Enter = Ambil Nomor, Ctrl+S = Mulai OTP, Ctrl+X = Stop', 'info');
+  log('Dashboard siap. Edit range di textarea, klik chip untuk pilih, lalu Ambil Nomor.', 'info');
+})();
 </script>
 
 </body>
